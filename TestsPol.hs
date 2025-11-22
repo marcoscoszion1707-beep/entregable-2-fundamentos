@@ -1,3 +1,4 @@
+--Marcos Coszion 332945, Francisco Lino 347691 
 module TestsPol where
 
 -- Requisitos: módulos Polinomios y ExpPol con las funciones pedidas

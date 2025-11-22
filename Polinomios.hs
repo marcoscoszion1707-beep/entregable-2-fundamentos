@@ -1,4 +1,4 @@
---Marcos Coszion 332945, Francisco Lino 347691 hola
+--Marcos Coszion 332945, Francisco Lino 347691 
 {-# OPTIONS_GHC -fno-warn-tabs #-}
 {-#LANGUAGE GADTs#-}
 
