@@ -13,7 +13,7 @@ type Polinomio = [Monomio]
 
 --1)
 agregarMon :: Monomio -> Polinomio -> Polinomio
-agregarMon =   /m p -> case m of{
+agregarMon =   \m p -> case m of{
     (0,e) -> p;
     (c,e) -> case p of {
         [] -> [(c,e)];
@@ -45,12 +45,12 @@ sumPol = \p1 p2 -> case p1 of{
         [] -> p1;
         (c2,e2) : ps2 -> case (e1 == e2) of{
             True -> case (c1 + c2 == 0) of{
-                True -> sumaPol ps1 ps2;
-                False -> (c1 + c2, e1) : sumaPol ps1 ps2
+                True -> sumPol ps1 ps2;
+                False -> (c1 + c2, e1) : sumPol ps1 ps2
             };
             False -> case (e1 > e2) of{
-                True -> (c1,e1) : sumaPol ps1 p2;
-                False -> (c2,e2) : sumaPol p1 ps2
+                True -> (c1,e1) : sumPol ps1 p2;
+                False -> (c2,e2) : sumPol p1 ps2
             }
         }
     }
@@ -73,7 +73,7 @@ mulMonPol = \m p -> case p of{
 mulPol :: Polinomio -> Polinomio -> Polinomio
 mulPol = \p1 p2 -> case p1 of{
     [] -> [];
-    m1 : ps1 -> sumaPol (mulMonPol m1 p2) (mulPol ps1 p2)
+    m1 : ps1 -> sumPol (mulMonPol m1 p2) (mulPol ps1 p2)
 }
 
 --5)
@@ -90,7 +90,7 @@ derPol = \p -> case p of{
 evalPol :: Polinomio -> Int -> Int
 evalPol = \p i -> case p of{
     [] -> 0;
-    (c,e) : ps -> c * (v ^ e) + evalPol ps i
+    (c,e) : ps -> c * (i ^ e) + evalPol ps i
 }
 
 --7)
@@ -147,9 +147,8 @@ showPol = \p -> case p of{
                 False -> showMon (c,e) ++ showRestoNeg ps
             }
         }
-
 }  
-showResto :: polinomio -> String
+showResto :: Polinomio -> String
 showResto = \p -> case p of{
     [] -> "";
 
