@@ -134,4 +134,52 @@ showMon = \m -> case m of{
 
 --9)
 showPol :: Polinomio -> String
-showPol = undefined  
+showPol = \p -> case p of{
+
+        [] -> "0";
+
+        (c,e) : ps -> case (c == 0) of{
+            True -> showResto ps;
+            False -> case (c > 0) of{
+
+                True -> "+" ++ showMon (c,e) ++ showResto ps;
+
+                False -> showMon (c,e) ++ showRestoNeg ps
+            }
+        }
+
+}  
+showResto :: polinomio -> String
+showResto = \p -> case p of{
+    [] -> "";
+
+    (c,e) : ps -> case (c==0) of{
+        
+        True -> showResto ps;
+
+        False -> case (c > 0) of{
+            True -> " + " ++ showMon (c,e) ++ showResto ps;
+            False -> showMon (c,e) ++ showRestoNeg ps
+        }
+    }
+}
+
+showRestoNeg :: Polinomio -> String
+showRestoNeg = \p -> case p of{
+    [] -> "";
+
+    (c,e) : ps -> case (c==0) of{
+
+        True -> showRestoNeg ps;
+        
+        False -> case (c > 0) of{
+
+            True -> "+" ++ showMon (c,e) ++ showResto ps;
+
+            False -> showMon (c,e) ++ showRestoNeg ps
+        }
+    }
+}
+
+
+
