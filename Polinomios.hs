@@ -58,25 +58,47 @@ sumPol = \p1 p2 -> case p1 of{
 
 --4)
 mulMon :: Monomio -> Monomio -> Monomio
-mulMon =
+mulMon = \m1 m2 -> case m1 of{
+    (c1,e1) -> case m2 of{
+        (c2,e2) -> (c1 * c2, e1 + e2)
+    }
+}
 
 mulMonPol :: Monomio -> Polinomio -> Polinomio
-mulMonPol = \
+mulMonPol = \m p -> case p of{
+    [] -> [];
+    m1 : ps -> agregarMon (mulMon m m1) (mulMonPol m ps)
+}
 
 mulPol :: Polinomio -> Polinomio -> Polinomio
-mulPol = 
+mulPol = \p1 p2 -> case p1 of{
+    [] -> [];
+    m1 : ps1 -> sumaPol (mulMonPol m1 p2) (mulPol ps1 p2)
+}
 
 --5)
 derPol :: Polinomio -> Polinomio
-derPol = undefined
+derPol = \p -> case p of{
+    [] -> [];
+    (c,e) : ps -> case (e == 0)of{
+        True -> derPol ps;
+        False -> (c * e, e - 1) : derPol ps
+    }
+}
 
 --6)
 evalPol :: Polinomio -> Int -> Int
-evalPol = undefined
+evalPol = \p i -> case p of{
+    [] -> 0;
+    (c,e) : ps -> c * (v ^ e) + evalPol ps i
+}
 
 --7)
-gradoPol::Polinomio -> Int
-gradoPol = undefined
+gradoPol :: Polinomio -> Int
+gradoPol = \p -> case p of{
+    [] -> 0;
+    (c,e) : ps -> e
+}
 																	
 																	
 -- ======================
@@ -85,7 +107,30 @@ gradoPol = undefined
 
 --8)
 showMon :: Monomio -> String
-showMon = undefined
+showMon = \m -> case m of{
+    (c,e) -> case(c == 0) of{
+        True -> "";
+        False -> case (e == 0) of{
+            True -> show c;
+            False -> case (e == 1) of{
+                True -> case(c == 1) of{
+                    True -> "x";
+                    False -> case (c == -1) of{
+                        True -> "-x";
+                        False -> show c ++ "x"
+                    }
+                };
+                False -> case (c == 1) of{
+                    True -> "x^" ++ show e;
+                    False -> case (c == -1) of{
+                        True -> "-x^" ++ show e;
+                        False -> show c ++ "x^" ++ show e
+                    }
+                }
+            }
+        }
+    }
+}
 
 --9)
 showPol :: Polinomio -> String
