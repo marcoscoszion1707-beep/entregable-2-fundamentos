@@ -1,6 +1,10 @@
 --Marcos Coszion 332945, Francisco Lino 347691 
 {-# OPTIONS_GHC -fno-warn-tabs #-}
 {-#LANGUAGE GADTs#-}
+{-# LANGUAGE BlockArguments #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Redundant lambda" #-}
+{-# HLINT ignore "Use lambda-case" #-}
 
 module ExpPol where
 
@@ -22,46 +26,50 @@ data ExPol where
 --10) 
 cantPol :: ExPol -> Int
 cantPol = \exp -> case exp of 
-	Pol p -> 1
 
-	Der e     -> cantPol e
+    Pol p -> 1
 
-    Eval e n  -> cantPol e
+    Der e -> cantPol e
 
-	Sum lista -> case lista of
+    Eval e n -> cantPol e
 
-		[] -> 0
+    Sum lista -> case lista of 
+        [] -> 0
+        (e:es) -> cantPol e + cantPol (Sum es)
+    
 
-		e:es -> cantPol e + cantPol (Sum es)
-	 
+    Prod lista -> case lista of 
+        [] -> 0
+        (e:es) -> cantPol e + cantPol (Prod es)
+    
 
-	Prod lista -> case lista of
-		[] -> 0
-		
-		e:es -> cantPol e + cantPol (Prod es)
+
+
 	 
 
 
 --11)
 cantx :: ExPol -> Int
-cantx  =  \exp -> case exp of 
+cantx = \exp -> case exp of 
 
-	Pol p -> cantEnPol p
+    Pol p -> cantEnPol p
 
     Der e -> cantx e
 
     Eval e n -> cantx e
 
-	Sum lista -> case lista of
-		
-		[] -> 0
-		e:es -> cantx e + cantx (Sum es)
-	
+    Sum lista -> case lista of 
+        [] -> 0
+        (e:es) -> cantx e + cantx (Sum es)
+    
 
-	Prod lista -> case lista of
+    Prod lista -> case lista of 
+        [] -> 0
+        (e:es) -> cantx e + cantx (Prod es)
+    
 
-		[] -> 0
-		e:es -> cantx e + cantx (Prod es)
+
+
 	
 
 
@@ -77,6 +85,21 @@ cantEnPol = \p -> case p of
 
 
 --12)
+
+
+mayorSubProd :: ExPol -> [ExPol] -> Int
+mayorSubProd = \e es -> case es of 
+
+		[] -> maxProd e
+
+		x:xs -> case (maxProd e > mayorSubProd x xs) of
+
+			True -> maxProd e
+
+			False -> mayorSubProd x xs
+
+
+
 maxProd :: ExPol -> Int
 maxProd  = \exp -> case exp of 
 
@@ -111,37 +134,28 @@ maxProd  = \exp -> case exp of
 	  
 	
 
-	mayorSubProd :: ExPol -> [ExPol] -> Int
-	mayorSubProd = \e es -> case es of 
-
-		[] -> maxProd e
-
-		x:xs -> case (maxProd e > mayorSubProd x xs) of
-
-			True -> maxProd e
-
-			False -> mayorSubProd x xs
+	
 		
 	
 
 
 --13)
-gradoPol :: Polinomio -> Int
-gradoPol = \p -> case p of 
+gradoP :: Polinomio -> Int
+gradoP = \p -> case p of 
 
 	[] -> 0
 
-	(c,e):ps -> case (e > gradoPol ps) of
+	(c,e):ps -> case (e > gradoP ps) of
 
 		True -> e
 
-		False -> gradoPol ps
+		False -> gradoP ps
 	
 
-	gradoEP :: ExPol -> Int
-	gradoEP = \exp -> case exp of 
+gradoEP :: ExPol -> Int
+gradoEP = \exp -> case exp of 
 
-	Pol p -> gradoPol p
+	Pol p -> gradoP p
 
 	Der e -> gradoEP e
 
@@ -176,32 +190,25 @@ gradoPol = \p -> case p of
 
 --14)	
 calcEP :: ExPol -> Polinomio
-calcEP =  \exp -> case exp of 
-		Pol p -> redPol p
+calcEP = \exp -> case exp of
 
-		Der e -> derPol (calcEP e)
+    Pol p -> redPol p
 
-		case evalPol (calcEP e) n of
+    Der e -> derPol (calcEP e)
 
-			0 -> []
+    Eval e n ->
+        case evalPol (calcEP e) n of
+            0     -> []
+            valor -> [(valor,0)]
 
-			valor -> [(valor,0)]
-		
+    Sum lista -> case lista of
+        []     -> []
+        e:es   -> sumPol (calcEP e) (calcEP (Sum es))
 
-		Sum lista -> case lista of
-
-			[] -> []
-
-			e:es -> sumPol (calcEP e) (calcEP (Sum es))
-		
-
-		Prod lista -> case lista of	
-
-			[] -> []
-
-			e:es -> mulPol (calcEP e) (calcEP (Prod es))
-		
-    
+    Prod lista -> case lista of
+        []     -> [(1,0)]               
+        [e]    -> calcEP e
+        e:es   -> mulPol (calcEP e) (calcEP (Prod es))
 
 
 
